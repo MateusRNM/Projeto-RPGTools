@@ -119,6 +119,23 @@
     }
 
     async function deleteRoom(i){
+        let roomDoc = await getDoc(doc(roomsCollectionRef, roomsCreated[i]))
+        let players = roomDoc.data()
+        players = players.jogadores
+        for(let player of players){
+            if(player.uid == auth.currentUser.uid){
+                continue
+            }
+            let roomsEnteredUpdated = player.roomsEntered
+            roomsEnteredUpdated.splice(roomsEnteredUpdated.indexOf(roomsCreated[i]), 1)
+            await setDoc(doc(userCollectionRef, player.uid), {
+                nome: player.nome,
+                personagens: player.personagens,
+                roomsCreated: player.roomsCreated,
+                roomsEntered: roomsEnteredUpdated,
+                uid: player.uid
+            })
+        }
         await deleteDoc(doc(roomsCollectionRef, roomsCreated[i]))
         roomsCreated.splice(i, 1)
         saveData()
