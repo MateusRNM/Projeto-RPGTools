@@ -29,7 +29,7 @@
             roomsCreated: [],
             roomsEntered: []
         })
-        goto('/mainMenu')
+        goto('/Projeto-RPGTools/mainMenu')
     }
 </script>
 

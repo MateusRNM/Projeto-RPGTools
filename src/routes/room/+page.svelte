@@ -58,7 +58,7 @@
     onAuthStateChanged(auth, async (user) => {
         if(user){
             if(roomDocRef == null){
-                goto('/mainMenu')
+                goto('/Projeto-RPGTools/mainMenu')
             }
         }
     })

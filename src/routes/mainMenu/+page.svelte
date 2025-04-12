@@ -39,7 +39,7 @@
 
     async function logout(){
         await auth.signOut()
-        goto('/')
+        goto('/Projeto-RPGTools/')
     }
 
     function addChar(){
@@ -92,7 +92,7 @@
         roomsCreated.push(roomName)
         await saveData()
         setRoomRef(roomName)
-        goto('/room')
+        goto('/Projeto-RPGTools/room')
     }
 
     async function enterRoom(){
@@ -115,7 +115,7 @@
         }
         await saveData()
         setRoomRef(roomName.toString())
-        goto("/room")
+        goto("/Projeto-RPGTools/room")
     }
 
     async function deleteRoom(i){
@@ -126,7 +126,7 @@
 
     function accessRoom(room){
         setRoomRef(room)
-        goto('/room')
+        goto('/Projeto-RPGTools/room')
     }
 </script>
 
