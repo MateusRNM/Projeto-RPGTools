@@ -19,7 +19,7 @@
         const result = await signInWithEmailAndPassword(auth, email, senha).catch((error) => {
             erro = error
         })
-        goto('/Projeto-RPGTools/mainMenu')
+        goto('/mainMenu')
     }
 </script>
 

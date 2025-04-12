@@ -49,6 +49,7 @@
                         players.push(userData)
                         saveRoomData()
                     }
+                    organizarIniciativa()
                 }
             })
         }
@@ -57,7 +58,7 @@
     onAuthStateChanged(auth, async (user) => {
         if(user){
             if(roomDocRef == null){
-                goto('/Projeto-RPGTools/mainMenu')
+                goto('/mainMenu')
             }
         }
     })
@@ -113,6 +114,35 @@
         playerCharacters.splice(i, 1)
         saveUserData()
     }   
+
+    function setIniciativa(value, i){
+        characters[i].iniciativa = value
+        saveRoomData()
+    }
+
+    function setCritico(value, i){
+        characters[i].critico = value
+        saveRoomData()
+    }
+
+    function setAtributoDoTeste(value, i){
+        characters[i].atributoDoTeste = value
+        saveRoomData()
+    }
+
+    function organizarIniciativa(){
+        characters = characters.sort((a, b) => {
+            if(b.iniciativa !== a.iniciativa){
+                return b.iniciativa - a.iniciativa
+            }
+
+            if(b.critico !== a.critico){
+                return b.critico ? 1 : -1
+            }
+
+            return b.atributoDoTeste - a.atributoDoTeste
+        })
+    }
 </script>
 
 <dialog open={dialogState != -1 ? true : false} onclick={(ev) => {
@@ -164,6 +194,28 @@
     </center>
 </div>
 
+<div class="functionsBox">
+    <center><h2>INICIATIVA</h2></center>
+    <div class="list" id="initiativeList">
+        <center>
+            {#each characters as char, i}
+                <div class="charBox initiativeBox">
+                    <p class="charText initiativeText">{(char.nome)}</p>
+                    <p class="initiativeInputsText">VALOR:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.includes(char.nome)} value={(char.iniciativa)} onchange={(e) => {
+                        setIniciativa(Number(e.srcElement.value), i)
+                    }}>
+                    <p class="initiativeInputsText">CRÍTICO:</p><input class="initiativeInputs" type="checkbox" disabled={!playerCharacters.includes(char.nome)} checked={(char.critico)} onchange={(e) => {
+                        setCritico(e.srcElement.checked, i)
+                    }}>
+                    <p class="initiativeInputsText">ATRIBUTO DO TESTE:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.includes(char.nome)} value={(char.atributoDoTeste)} onchange={(e) => {
+                        setAtributoDoTeste(Number(e.srcElement.value), i)
+                    }}>
+                </div>
+            {/each}
+        </center>
+    </div>
+</div>
+
 <style>
 * {
     font-family: Impact;
@@ -174,6 +226,10 @@
     overflow: hidden;
 }
 .infosBox {
+    position: absolute;
+    left: 0.5%;
+    top: 50%;
+    transform: translate(0px, -50%);
     background-color: white;
     width: 20%;
     height: 80vh;
@@ -181,6 +237,21 @@
     box-shadow: 0 0 30px #314d4a;
     overflow: auto;
     scrollbar-width: none;
+}
+.functionsBox {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    width: 50%;
+    height: 80vh;
+    border-radius: 16px;
+    box-shadow: 0 0 30px #314d4a;
+    overflow: auto;
+    scrollbar-width: none;
+    padding-left: 0.5%;
+    padding-right: 0.5%;
 }
 h2 {
     color: black;
@@ -321,5 +392,30 @@ dialog {
     height: 3.5vh;
     border-radius: 13px;
     margin-left: 2.5%;
+}
+#initiativeList {
+    width: 100%;
+    height: 90%;
+}
+.initiativeBox {
+    height: 20vh;
+    overflow: auto;
+    scrollbar-width: none;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+.initiativeText {
+    top: 2%;
+}
+.initiativeInputsText {
+    color: black;
+}
+.initiativeInputs {
+    width: 10%;
+    text-align: center;
+    padding:  0px;
+}
+input[type=number]::-webkit-inner-spin-button{
+    appearance: none;
 }
 </style>

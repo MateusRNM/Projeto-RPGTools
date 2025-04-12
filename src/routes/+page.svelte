@@ -5,7 +5,7 @@
 
     onAuthStateChanged(auth, (user) => {
         if(user){
-            goto('/Projeto-RPGTools/mainMenu')
+            goto('/mainMenu')
         }
     })
 </script>
@@ -13,8 +13,8 @@
 <center><h1>RPG TOOLS</h1></center>
 <div class="box">
     <div class="centralBox">
-        <button onclick={() => goto('/Projeto-RPGTools/login')}>LOGAR</button><br>
-        <button onclick={() => goto('/Projeto-RPGTools/registrar')}>REGISTRAR</button>
+        <button onclick={() => goto('/login')}>LOGAR</button><br>
+        <button onclick={() => goto('/registrar')}>REGISTRAR</button>
     </div>
 </div>
 
