@@ -18,6 +18,7 @@
         await setPersistence(auth, browserLocalPersistence)
         const result = await signInWithEmailAndPassword(auth, email, senha).catch((error) => {
             erro = error
+            return
         })
         goto('/Projeto-RPGTools/mainMenu')
     }

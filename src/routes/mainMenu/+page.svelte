@@ -12,7 +12,7 @@
     let roomName = $state("")
     let roomPassword = $state("")
     let roomError = $state("")
-    let userDoc = $state()
+    let userDoc = $state(null)
 
     onAuthStateChanged(auth, async (user) => {
         if(user){
@@ -57,6 +57,9 @@
     }
 
     async function saveData(){
+        if(userDoc == null){
+            goto('/Projeto-RPGTools/')
+        }
         let userDocRef = await doc(userCollectionRef, auth.currentUser.uid)
         await setDoc(userDocRef, {
             nome: username,
@@ -68,6 +71,9 @@
     }
 
     async function createRoom(){
+        if(userDoc == null){
+            goto('/Projeto-RPGTools/')
+        }
         if(roomName == "" || roomPassword == ""){
             roomError = "Preencha todos os campos."
             return
@@ -96,6 +102,9 @@
     }
 
     async function enterRoom(){
+        if(userDoc == null){
+            goto('/Projeto-RPGTools/')
+        }
         if(roomName == "" || roomPassword == ""){
             roomError = "Preencha todos os campos."
             return
@@ -119,6 +128,9 @@
     }
 
     async function deleteRoom(i){
+        if(userDoc == null){
+            goto('/Projeto-RPGTools/')
+        }
         let roomDoc = await getDoc(doc(roomsCollectionRef, roomsCreated[i]))
         let players = roomDoc.data()
         players = players.jogadores
@@ -142,6 +154,9 @@
     }
 
     function accessRoom(room){
+        if(userDoc == null){
+            goto('/Projeto-RPGTools/')
+        }
         setRoomRef(room)
         goto('/Projeto-RPGTools/room')
     }
