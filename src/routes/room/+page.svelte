@@ -145,74 +145,76 @@
     }
 </script>
 
-<dialog open={dialogState != -1 ? true : false} onclick={(ev) => {
-    if(ev.srcElement.localName == "dialog"){
-        dialogState = -1
-        addCharName = ""
-    }
-}}>
-<div class="dialogBox">
-    {#if dialogState == 0}
+<div class="box">
+    <dialog open={dialogState != -1 ? true : false} onclick={(ev) => {
+        if(ev.srcElement.localName == "dialog"){
+            dialogState = -1
+            addCharName = ""
+        }
+    }}>
+    <div class="dialogBox">
+        {#if dialogState == 0}
+            <center>
+                <h3>ADICIONAR PERSONAGEM</h3>
+                <div class="list">
+                    {#each playerCharacters as character, i}
+                        {#if charactersNames.includes(character) == false}
+                            <div class="charBox">
+                                <p class="charText">{character}</p> <button class="addBtn" onclick={() => addCharacterInRoom(i)}>+</button> <button class="removeBtn" onclick={() => removeChar(i)}>-</button>
+                            </div>
+                        {/if}
+                    {/each}
+                </div>
+                <h3>ADICIONAR PERSONAGEM</h3>
+                <input bind:value={addCharName}> <button id="addBtn" onclick={addChar}>+</button>
+            </center>
+        {/if}
+    </div>
+    </dialog>
+    
+    <center><h1>RPG TOOLS</h1></center>
+    
+    <div class="infosBox">
         <center>
-            <h3>ADICIONAR PERSONAGEM</h3>
+            <h2>{roomName}</h2>
+            <h3>JOGADORES</h3>
             <div class="list">
-                {#each playerCharacters as character, i}
-                    {#if charactersNames.includes(character) == false}
-                        <div class="charBox">
-                            <p class="charText">{character}</p> <button class="addBtn" onclick={() => addCharacterInRoom(i)}>+</button> <button class="removeBtn" onclick={() => removeChar(i)}>-</button>
-                        </div>
-                    {/if}
+                {#each players as player}
+                    <p>{(player.nome)}</p>
                 {/each}
             </div>
-            <h3>ADICIONAR PERSONAGEM</h3>
-            <input bind:value={addCharName}> <button id="addBtn" onclick={addChar}>+</button>
+            <h3>PERSONAGENS</h3>
+            <button style="background-color: #0b8770;" onclick={() => dialogState = 0}>ADICIONAR PERSONAGEM</button>
+            <div class="list">
+                {#each charactersNames as character, i}
+                    <div class="charBox">
+                        <p class="charText">{character}</p> {#if playerCharacters.includes(character)}<button class="removeBtn" onclick={() => removeCharacterInRoom(i)}>-</button>{/if}
+                    </div>
+                {/each}
+            </div>
         </center>
-    {/if}
-</div>
-</dialog>
-
-<center><h1>RPG TOOLS</h1></center>
-
-<div class="infosBox">
-    <center>
-        <h2>{roomName}</h2>
-        <h3>JOGADORES</h3>
-        <div class="list">
-            {#each players as player}
-                <p>{(player.nome)}</p>
-            {/each}
+    </div>
+    
+    <div class="functionsBox">
+        <center><h2>INICIATIVA</h2></center>
+        <div class="list" id="initiativeList">
+            <center>
+                {#each characters as char, i}
+                    <div class="charBox initiativeBox">
+                        <p class="charText initiativeText">{(char.nome)}</p>
+                        <p class="initiativeInputsText">VALOR:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.includes(char.nome)} value={(char.iniciativa)} onchange={(e) => {
+                            setIniciativa(Number(e.srcElement.value), i)
+                        }}>
+                        <p class="initiativeInputsText">CRÍTICO:</p><input class="initiativeInputs" type="checkbox" disabled={!playerCharacters.includes(char.nome)} checked={(char.critico)} onchange={(e) => {
+                            setCritico(e.srcElement.checked, i)
+                        }}>
+                        <p class="initiativeInputsText">ATRIBUTO DO TESTE:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.includes(char.nome)} value={(char.atributoDoTeste)} onchange={(e) => {
+                            setAtributoDoTeste(Number(e.srcElement.value), i)
+                        }}>
+                    </div>
+                {/each}
+            </center>
         </div>
-        <h3>PERSONAGENS</h3>
-        <button style="background-color: #0b8770;" onclick={() => dialogState = 0}>ADICIONAR PERSONAGEM</button>
-        <div class="list">
-            {#each charactersNames as character, i}
-                <div class="charBox">
-                    <p class="charText">{character}</p> {#if playerCharacters.includes(character)}<button class="removeBtn" onclick={() => removeCharacterInRoom(i)}>-</button>{/if}
-                </div>
-            {/each}
-        </div>
-    </center>
-</div>
-
-<div class="functionsBox">
-    <center><h2>INICIATIVA</h2></center>
-    <div class="list" id="initiativeList">
-        <center>
-            {#each characters as char, i}
-                <div class="charBox initiativeBox">
-                    <p class="charText initiativeText">{(char.nome)}</p>
-                    <p class="initiativeInputsText">VALOR:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.includes(char.nome)} value={(char.iniciativa)} onchange={(e) => {
-                        setIniciativa(Number(e.srcElement.value), i)
-                    }}>
-                    <p class="initiativeInputsText">CRÍTICO:</p><input class="initiativeInputs" type="checkbox" disabled={!playerCharacters.includes(char.nome)} checked={(char.critico)} onchange={(e) => {
-                        setCritico(e.srcElement.checked, i)
-                    }}>
-                    <p class="initiativeInputsText">ATRIBUTO DO TESTE:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.includes(char.nome)} value={(char.atributoDoTeste)} onchange={(e) => {
-                        setAtributoDoTeste(Number(e.srcElement.value), i)
-                    }}>
-                </div>
-            {/each}
-        </center>
     </div>
 </div>
 
@@ -225,11 +227,16 @@
     background-color: #17181f;
     overflow: hidden;
 }
-.infosBox {
+.box {
     position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.infosBox {
+    position: relative;
     left: 0.5%;
-    top: 50%;
-    transform: translate(0px, -50%);
     background-color: white;
     width: 20%;
     height: 80vh;
@@ -239,10 +246,9 @@
     scrollbar-width: none;
 }
 .functionsBox {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
+    left: 25%;
+    top: -80%;
     background-color: white;
     width: 50%;
     height: 80vh;
@@ -265,6 +271,7 @@ h3 {
     width: 95%;
     height: 35vh;
     border-radius: 8px;
+    white-space: nowrap;
 }
 p {
     color: white;
@@ -294,33 +301,33 @@ button:hover {
 }
 @keyframes show {
     0% {
-        left: 35%;
-        top: 40%;
+        left: 15%;
+        top: 10%;
         scale: 0
     }
     20% {
-        left: 40%;
-        top: 42%;
+        left: 15%;
+        top: 10%;
         scale: 0.2
     }
     40% {
-        left: 45%;
-        top: 44%;
+        left: 20%;
+        top: 10%;
         scale: 0.4
     }
     60% {
-        left: 45%;
-        top: 46%;
+        left: 25%;
+        top: 10%;
         scale: 0.6
     }
     80% {
-        left: 50%;
-        top: 48%;
+        left: 30%;
+        top: 10%;
         scale: 0.8
     }
     100% {
-        left: 50%;
-        top: 50%;
+        left: 35%;
+        top: 10%;
         scale: 1
     }
 }
@@ -335,10 +342,9 @@ dialog {
     border: none;
 }
 .dialogBox {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
+    left: 35%;
+    top: 10%;
     width: 25%;
     height: 70%;
     background-color: white;
@@ -396,11 +402,11 @@ dialog {
 #initiativeList {
     width: 100%;
     height: 90%;
+    overflow: auto;
 }
 .initiativeBox {
-    height: 20vh;
+    height: 32vh;
     overflow: auto;
-    scrollbar-width: none;
     margin-top: 2%;
     margin-bottom: 2%;
     padding-bottom: 2%;
@@ -420,40 +426,42 @@ input[type=number]::-webkit-inner-spin-button{
     appearance: none;
 }
 @media(max-height: 800px){
-    .box {
-        width: 45%;
-        height: 50%;
-    }
     button {
         width: 35%;
-        height: 6vh;
+        height: 7vh;
     }
     input {
-        height: 4vh;
+        height: 5vh;
         width: 60%;
     }
+    .charBox {
+        height: 8vh;
+        width: 96%;
+    }
     #addBtn {
-        top: -90%;
         width: 3vw;
-        height: 4.5vh;
+        height: 5vh;
     }
     .addBtn {
-        top: -90%;
-        left: 35%;
-        width: 2.5vw;
-        height: 3.5vh;
+        top: -60%;
+        left: 30%;
+        width: 3vw;
+        height: 5vh;
     }
     .removeBtn {
-        top: -90%;
-        left: 36%;
-        height: 3.5vh;
-        width: 2.5vw;
+        top: -60%;
+        left: 34%;
+        height: 5vh;
+        width: 3vw;
     }
     .charText {
         left: 40%;
     }
     .initiativeText{
         left: 50%;
+    }
+    .initiativeBox {
+        height: 32vh;
     }
 }
 </style>

@@ -66,7 +66,7 @@ button:hover {
         height: 50%;
     }
     button {
-        height: 5vh;
+        height: 7vh;
     }
 }
 </style>

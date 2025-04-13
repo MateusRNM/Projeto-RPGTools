@@ -259,33 +259,33 @@ input {
 }
 @keyframes show {
     0% {
-        left: 35%;
-        top: 40%;
+        left: 15%;
+        top: 10%;
         scale: 0
     }
     20% {
-        left: 40%;
-        top: 42%;
+        left: 15%;
+        top: 10%;
         scale: 0.2
     }
     40% {
-        left: 45%;
-        top: 44%;
+        left: 20%;
+        top: 10%;
         scale: 0.4
     }
     60% {
-        left: 45%;
-        top: 46%;
+        left: 25%;
+        top: 10%;
         scale: 0.6
     }
     80% {
-        left: 50%;
-        top: 48%;
+        left: 30%;
+        top: 10%;
         scale: 0.8
     }
     100% {
-        left: 50%;
-        top: 50%;
+        left: 35%;
+        top: 10%;
         scale: 1
     }
 }
@@ -300,10 +300,9 @@ dialog {
     border: none;
 }
 .dialogBox {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
+    left: 35%;
+    top: 10%;
     width: 25%;
     height: 70%;
     background-color: white;
@@ -379,20 +378,29 @@ h3 {
     }
     button {
         width: 32%;
-        height: 5vh;
+        height: 7vh;
     }
     input {
-        height: 4vh;
+        height: 5vh;
         width: 60%;
     }
     #addBtn {
         width: 3vw;
-        height: 4.5vh;
+        height: 5vh;
+    }
+    .charBox {
+        height: 8vh;
+        width: 96%;
+    }
+    .accessBtn {
+        height: 5vh;
+        width: 4.3vw;
+        font-size: 14px;
     }
     .removeBtn {
-        top: -90%;
-        height: 3.5vh;
-        width: 2.5vw;
+        top: -65%;
+        height: 5vh;
+        width: 3vw;
     }
 }
 </style>

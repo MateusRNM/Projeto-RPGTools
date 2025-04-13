@@ -101,10 +101,10 @@ p {
         height: 50%;
     }
     button {
-        height: 5vh;
+        height: 7vh;
     }
     input {
-        height: 4vh;
+        height: 5vh;
     }
 }
 </style>
