@@ -198,7 +198,7 @@
                 <h3>MINHAS SALAS</h3>
                 <div class="charList">
                     {#each roomsCreated as room, i}
-                        <div class="charBox"><p class="charText">{room}</p> <button class="accessBtn" style="top: -78%; left: 30%;" onclick={() => accessRoom(room)}>ACESSAR</button> <button class="removeBtn" style="left: 33%;" onclick={() => deleteRoom(i)}>-</button></div>
+                        <div class="charBox"><p class="charText">{room}</p> <button class="accessBtn" onclick={() => accessRoom(room)}>ACESSAR</button> <button class="removeBtn" style="left: 33%;" onclick={() => deleteRoom(i)}>-</button></div>
                     {/each}
                 </div>
                 <h3>SALAS ACESSADAS</h3>
@@ -374,8 +374,8 @@ h3 {
 }
 .accessBtn {
     position: relative;
-    left: 38%;
-    top: -70%;
+    left: 30%;
+    top: -80%;
     background-color: #0b8770;
     width: 4vw;
     height: 3.5vh;
@@ -409,12 +409,13 @@ h3 {
     }
     .accessBtn {
         height: 5vh;
-        width: 4.3vw;
+        width: 4.5vw;
         font-size: 14px;
-        top: -60%;
+        top: -55%;
+        text-align: center;
     }
     .removeBtn {
-        top: -65%;
+        top: -50%;
         height: 5vh;
         width: 3vw;
     }

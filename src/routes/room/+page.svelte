@@ -427,7 +427,7 @@ input[type=number]::-webkit-inner-spin-button{
 }
 @media(max-height: 800px){
     button {
-        width: 35%;
+        width: 38%;
         height: 7vh;
     }
     input {
@@ -443,13 +443,13 @@ input[type=number]::-webkit-inner-spin-button{
         height: 5vh;
     }
     .addBtn {
-        top: -60%;
+        top: -50%;
         left: 30%;
         width: 3vw;
         height: 5vh;
     }
     .removeBtn {
-        top: -60%;
+        top: -50%;
         left: 34%;
         height: 5vh;
         width: 3vw;
