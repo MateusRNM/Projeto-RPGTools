@@ -146,7 +146,7 @@
 </script>
 
 <div class="box">
-    <dialog open={dialogState != -1 ? true : false} onclick={(ev) => {
+    <dialog open={dialogState != -1} onclick={(ev) => {
         if(ev.srcElement.localName == "dialog"){
             dialogState = -1
             addCharName = ""
