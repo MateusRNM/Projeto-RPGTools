@@ -396,6 +396,7 @@ h3 {
         height: 5vh;
         width: 4.3vw;
         font-size: 14px;
+        top: -60%;
     }
     .removeBtn {
         top: -65%;
