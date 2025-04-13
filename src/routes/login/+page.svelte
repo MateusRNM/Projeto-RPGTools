@@ -55,7 +55,7 @@
 }
 button {
     outline: 0;
-    width: 30%;
+    width: 32%;
     height: 3.5vh;
     border-radius: 5px;
     border: none;
@@ -94,5 +94,17 @@ p {
     font-size: 18px;
     position: relative;
     left: 35%;
+}
+@media(max-height: 800px){
+    .box {
+        width: 45%;
+        height: 50%;
+    }
+    button {
+        height: 5vh;
+    }
+    input {
+        height: 4vh;
+    }
 }
 </style>

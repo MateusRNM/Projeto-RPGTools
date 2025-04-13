@@ -403,6 +403,7 @@ dialog {
     scrollbar-width: none;
     margin-top: 2%;
     margin-bottom: 2%;
+    padding-bottom: 2%;
 }
 .initiativeText {
     top: 2%;
@@ -417,5 +418,42 @@ dialog {
 }
 input[type=number]::-webkit-inner-spin-button{
     appearance: none;
+}
+@media(max-height: 800px){
+    .box {
+        width: 45%;
+        height: 50%;
+    }
+    button {
+        width: 35%;
+        height: 6vh;
+    }
+    input {
+        height: 4vh;
+        width: 60%;
+    }
+    #addBtn {
+        top: -90%;
+        width: 3vw;
+        height: 4.5vh;
+    }
+    .addBtn {
+        top: -90%;
+        left: 35%;
+        width: 2.5vw;
+        height: 3.5vh;
+    }
+    .removeBtn {
+        top: -90%;
+        left: 36%;
+        height: 3.5vh;
+        width: 2.5vw;
+    }
+    .charText {
+        left: 40%;
+    }
+    .initiativeText{
+        left: 50%;
+    }
 }
 </style>

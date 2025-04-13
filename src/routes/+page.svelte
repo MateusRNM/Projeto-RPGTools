@@ -60,4 +60,13 @@ button:hover {
     left: 35%;
     top: 25%;
 }
+@media(max-height: 800px){
+    .box {
+        width: 45%;
+        height: 50%;
+    }
+    button {
+        height: 5vh;
+    }
+}
 </style>

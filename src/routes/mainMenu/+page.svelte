@@ -372,4 +372,27 @@ h3 {
     margin-top: 2.5%;
     background-color: #0b8770;
 }
+@media(max-height: 800px){
+    .box {
+        width: 45%;
+        height: 50%;
+    }
+    button {
+        width: 32%;
+        height: 5vh;
+    }
+    input {
+        height: 4vh;
+        width: 60%;
+    }
+    #addBtn {
+        width: 3vw;
+        height: 4.5vh;
+    }
+    .removeBtn {
+        top: -90%;
+        height: 3.5vh;
+        width: 2.5vw;
+    }
+}
 </style>
