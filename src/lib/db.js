@@ -4,13 +4,13 @@ import { collection, doc, getFirestore } from "@firebase/firestore"
 import { writable } from "svelte/store"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAMr1F4rMtL-PGXUTAn64f28nZzKBksea0",
-  authDomain: "rpgtools-3f412.firebaseapp.com",
-  projectId: "rpgtools-3f412",
-  storageBucket: "rpgtools-3f412.firebasestorage.app",
-  messagingSenderId: "908558412169",
-  appId: "1:908558412169:web:10e8e3cd841df9f91b1958",
-  measurementId: "G-9CXXNRNT92"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 }
 
 export const app = initializeApp(firebaseConfig) 
