@@ -2,22 +2,25 @@
 	import { goto } from "$app/navigation";
 	import { auth, roomRef, roomsCollectionRef, userCollectionRef } from "$lib/db";
 	import { onAuthStateChanged } from "@firebase/auth";
-	import { getDoc, doc, DocumentReference, setDoc, onSnapshot } from "@firebase/firestore";
-	import { onMount } from "svelte";
+	import { getDoc, doc, setDoc, onSnapshot } from "@firebase/firestore";
+    import defaultCharImg from '$lib/assets/userDefaultImg.png';
     let roomDocRef = $state(null)
     let roomName = $state("")
     let roomOwner = $state("")
     let roomPassword = $state("")
     let characters = $state([])
-    let charactersNames = $state([])
     let playerCharacters = $state([])
     let username = $state(null)
     let players = $state([])
     let dialogState = $state(-1)
     let addCharName = $state("")
+    let charImgUrl = $state("")
     let roomsCreated = $state([])
     let roomsEntered = $state([])
     let userData = $state(undefined)
+    let editCharName = $state("")
+    let editCharImgUrl = $state("")
+    let editCharIdx = $state()
 
     roomRef.subscribe((value) => {
         roomDocRef = value
@@ -39,11 +42,7 @@
                     roomOwner = roomData.owner
                     roomPassword = roomData.senha
                     characters = roomData.personagens
-                    charactersNames = []
                     players = []
-                    for(let char of characters){
-                        charactersNames.push(char.nome)
-                    }
                     players = roomData.jogadores
                     if(!(players.some(player => player.uid == auth.currentUser.uid))){
                         players.push(userData)
@@ -65,19 +64,18 @@
 
     function addCharacterInRoom(i){
         let charObject = {
-            nome: playerCharacters[i],
+            nome: playerCharacters[i].nome,
+            img: playerCharacters[i].img,
             iniciativa: 0,
             critico: false,
             atributoDoTeste: 1
         }
         characters.push(charObject)
-        charactersNames.push(playerCharacters[i])
         saveRoomData()
     }
 
     function removeCharacterInRoom(i){
         characters.splice(i, 1)
-        charactersNames.splice(i, 1)
         saveRoomData()
     }
 
@@ -105,8 +103,12 @@
         if(addCharName == ""){
             return
         }
-        playerCharacters.push(addCharName)
+        playerCharacters.push({
+            nome: addCharName,
+            img: charImgUrl
+        })
         addCharName = ""
+        charImgUrl = ""
         saveUserData()
     }
 
@@ -114,6 +116,16 @@
         playerCharacters.splice(i, 1)
         saveUserData()
     }   
+
+    function editChar(){
+        if(editCharName == ""){
+            return
+        }
+        playerCharacters[editCharIdx].nome = editCharName
+        playerCharacters[editCharIdx].img = editCharImgUrl
+        saveUserData()
+        dialogState = -1
+    }
 
     function setIniciativa(value, i){
         characters[i].iniciativa = value
@@ -158,15 +170,27 @@
                 <h3>ADICIONAR PERSONAGEM</h3>
                 <div class="list">
                     {#each playerCharacters as character, i}
-                        {#if charactersNames.includes(character) == false}
-                            <div class="charBox">
-                                <p class="charText">{character}</p> <button class="addBtn" onclick={() => addCharacterInRoom(i)}>+</button> <button class="removeBtn" onclick={() => removeChar(i)}>-</button>
-                            </div>
+                        {#if !characters.some(char => char.nome == character.nome)}
+                            <div class="charBox"><div class="imgDiv"><img src={(character.img)} onerror={(e) => e.srcElement.src = defaultCharImg} alt=""></div><p class="charText" style="top: -60%;">{(character.nome)}</p> <button class="editBtn" onclick={() => {
+                                dialogState = 1
+                                editCharImgUrl = character.img
+                                editCharName = character.nome
+                                editCharIdx = i
+                            }}>EDITAR</button> <button class="addBtn" style="position: relative; top: -125%; left: 32%;" onclick={() => addCharacterInRoom(i)}>+</button> <button class="removeBtn" onclick={() => removeChar(i)}>-</button></div>
                         {/if}
                     {/each}
                 </div>
                 <h3>ADICIONAR PERSONAGEM</h3>
-                <input bind:value={addCharName}> <button id="addBtn" onclick={addChar}>+</button>
+                <p style="color: black;">Nome:</p><input bind:value={addCharName}>
+                <p style="color: black;">Imagem (URL):</p><input bind:value={charImgUrl}><br>
+                <button style="margin-top: 4%;" class="addBtn" onclick={addChar}>+</button>
+            </center>
+        {:else}
+            <center>
+                <h3>EDITAR PERSONAGEM</h3>
+                <p style="color: black;">Nome:</p><input bind:value={editCharName}>
+                <p style="color: black;">Imagem (URL):</p><input bind:value={editCharImgUrl}><br>
+                <button style="margin-top: 4%;" id="saveBtn" onclick={editChar}>SALVAR</button>
             </center>
         {/if}
     </div>
@@ -186,9 +210,9 @@
             <h3>PERSONAGENS</h3>
             <button style="background-color: #0b8770;" onclick={() => dialogState = 0}>ADICIONAR PERSONAGEM</button>
             <div class="list">
-                {#each charactersNames as character, i}
+                {#each characters as character, i}
                     <div class="charBox">
-                        <p class="charText">{character}</p> {#if playerCharacters.includes(character)}<button class="removeBtn" onclick={() => removeCharacterInRoom(i)}>-</button>{/if}
+                        <p class="charText">{(character.nome)}</p> {#if playerCharacters.some(char => char.nome == character.nome)}<button class="removeBtn" style="top: -15%;" onclick={() => removeCharacterInRoom(i)}>-</button>{/if}
                     </div>
                 {/each}
             </div>
@@ -199,16 +223,16 @@
         <center><h2>INICIATIVA</h2></center>
         <div class="list" id="initiativeList">
             <center>
-                {#each characters as char, i}
+                {#each characters as character, i}
                     <div class="charBox initiativeBox">
-                        <p class="charText initiativeText">{(char.nome)}</p>
-                        <p class="initiativeInputsText">VALOR:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.includes(char.nome)} value={(char.iniciativa)} onchange={(e) => {
+                        <p class="charText initiativeText">{(character.nome)}</p>
+                        <p class="initiativeInputsText">VALOR:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.some(char => char.nome == character.nome)} value={(character.iniciativa)} onchange={(e) => {
                             setIniciativa(Number(e.srcElement.value), i)
                         }}>
-                        <p class="initiativeInputsText">CRÍTICO:</p><input class="initiativeInputs" type="checkbox" disabled={!playerCharacters.includes(char.nome)} checked={(char.critico)} onchange={(e) => {
+                        <p class="initiativeInputsText">CRÍTICO:</p><input class="initiativeInputs" type="checkbox" disabled={!playerCharacters.some(char => char.nome == character.nome)} checked={(character.critico)} onchange={(e) => {
                             setCritico(e.srcElement.checked, i)
                         }}>
-                        <p class="initiativeInputsText">ATRIBUTO DO TESTE:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.includes(char.nome)} value={(char.atributoDoTeste)} onchange={(e) => {
+                        <p class="initiativeInputsText">ATRIBUTO DO TESTE:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.some(char => char.nome == character.nome)} value={(character.atributoDoTeste)} onchange={(e) => {
                             setAtributoDoTeste(Number(e.srcElement.value), i)
                         }}>
                     </div>
@@ -272,6 +296,8 @@ h3 {
     height: 35vh;
     border-radius: 8px;
     white-space: nowrap;
+    padding-top: 2%;
+    padding-bottom: 2%;
 }
 p {
     color: white;
@@ -292,7 +318,7 @@ button {
     border-radius: 5px;
     border: none;
     color: black;
-    font-size: 16px;
+    font-size: 100%;
     margin-bottom: 2.5%;
 }
 button:hover {
@@ -359,45 +385,54 @@ dialog {
 }
 .charBox {
     background-color: white;
-    width: 90%;
-    height: 4.5vh;
+    width: 98%;
+    height: 8vh;
     border-radius: 6px;
     box-shadow: 0 0 15px #314d4a;
+    margin-bottom: 2%;
 }
 .charText {
     color: black;
     font-size: 16px;
     position: relative;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: -8%;
+    transform: translate(0px, -50%);
+    text-wrap: auto;
+    max-width: 45%;
 }
 .addBtn {
-    position: relative;
-    left: 40%;
-    top: -70%;
     background-color: #0b8770;
     width: 2vw;
     height: 3.5vh;
     border-radius: 13px;
-    font-size: 24px;
 }
-.removeBtn {
-    position: relative;
-    left: 40%;
-    top: -70%;
-    background-color: #eb8d8d;
-    width: 2vw;
-    height: 3.5vh;
-    border-radius: 13px;
-    font-size: 24px;
-}
-#addBtn {
+#saveBtn {
     background-color: #0b8770;
     width: 2vw;
     height: 3.5vh;
     border-radius: 13px;
     margin-left: 2.5%;
+    width: fit-content;
+}
+.removeBtn {
+    position: relative;
+    left: 32%;
+    top: -125%;
+    background-color: #eb8d8d;
+    width: 2vw;
+    height: 3.5vh;
+    border-radius: 13px;
+    font-size: 100%;
+}
+.editBtn {
+    width: fit-content;
+    height: 3.5vh;
+    position: relative;
+    top: -125%;
+    left: 32%;
+    border-radius: 13px;
+    background-color: #ebe68d;
 }
 #initiativeList {
     width: 100%;
@@ -413,6 +448,12 @@ dialog {
 }
 .initiativeText {
     top: 2%;
+    max-width: auto;
+    text-wrap: none;
+    text-align: center;
+    left: 50%;
+    max-width: 100%;
+    transform: translate(-50%, -50%);
 }
 .initiativeInputsText {
     color: black;
@@ -425,7 +466,59 @@ dialog {
 input[type=number]::-webkit-inner-spin-button{
     appearance: none;
 }
+img {
+    object-fit: cover;
+    object-position: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 120px;
+}
+.imgDiv {
+    border-radius: 120px;
+    border: 4px solid black;
+    width: 14%;
+    height: 80%;
+    position: relative;
+    left: -40%;
+    top: 6%;
+}
 @media(max-height: 800px){
+    @keyframes show {
+        0% {
+            left: 15%;
+            top: 10%;
+            scale: 0
+        }
+        20% {
+            left: 15%;
+            top: 10%;
+            scale: 0.2
+        }
+        40% {
+            left: 15%;
+            top: 10%;
+            scale: 0.4
+        }
+        60% {
+            left: 15%;
+            top: 10%;
+            scale: 0.6
+        }
+        80% {
+            left: 20%;
+            top: 10%;
+            scale: 0.8
+        }
+        100% {
+            left: 25%;
+            top: 10%;
+            scale: 1
+        }
+    }
+    .dialogBox {
+        width: 55%;
+        left: 20%;
+    }
     button {
         width: 38%;
         height: 7vh;
@@ -435,33 +528,26 @@ input[type=number]::-webkit-inner-spin-button{
         width: 60%;
     }
     .charBox {
-        height: 8vh;
+        height: 11.5vh;
         width: 96%;
     }
-    #addBtn {
-        width: 3vw;
-        height: 5vh;
-    }
     .addBtn {
-        top: -50%;
-        left: 30%;
         width: 3vw;
         height: 5vh;
     }
     .removeBtn {
-        top: -50%;
-        left: 34%;
+        top: -125%;
         height: 5vh;
         width: 3vw;
-    }
-    .charText {
-        left: 40%;
     }
     .initiativeText{
         left: 50%;
     }
     .initiativeBox {
         height: 32vh;
+    }
+    .imgDiv {
+        width: 10%;
     }
 }
 </style>

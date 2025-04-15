@@ -3,16 +3,21 @@
 	import { auth, roomsCollectionRef, setRoomRef, userCollectionRef } from "$lib/db";
 	import { onAuthStateChanged } from "@firebase/auth";
 	import { deleteDoc, doc, getDoc, setDoc } from "@firebase/firestore";
+    import defaultCharImg from '$lib/assets/userDefaultImg.png';
     let dialogState = $state(-1)
     let characters = $state([])
     let roomsCreated = $state([])
     let roomsEntered = $state([])
     let username = $state("")
     let addCharName = $state("")
+    let charImgUrl = $state("")
     let roomName = $state("")
     let roomPassword = $state("")
     let roomError = $state("")
     let userDoc = $state(null)
+    let editCharName = $state("")
+    let editCharImgUrl = $state("")
+    let editCharIdx = $state()
 
     onAuthStateChanged(auth, async (user) => {
         if(user){
@@ -46,14 +51,28 @@
         if(addCharName == ""){
             return
         }
-        characters.push(addCharName)
+        characters.push({
+            nome: addCharName,
+            img: charImgUrl
+        })
         addCharName = ""
+        charImgUrl = ""
         saveData()
     }
 
     function removeChar(i){
         characters.splice(i, 1)
         saveData()
+    }
+
+    function editChar(){
+        if(editCharName == ""){
+            return
+        }
+        characters[editCharIdx].nome = editCharName
+        characters[editCharIdx].img = editCharImgUrl
+        saveData()
+        dialogState = -1
     }
 
     async function saveData(){
@@ -177,11 +196,18 @@
                 <h3>LISTA DE PERSONAGENS</h3>
                 <div class="charList">
                     {#each characters as character, i}
-                        <div class="charBox"><p class="charText">{character}</p> <button class="removeBtn" onclick={() => removeChar(i)}>-</button></div>
+                        <div class="charBox"><div class="imgDiv"><img src={(character.img)} onerror={(e) => e.srcElement.src = defaultCharImg} alt=""></div><p class="charText" style="top: -60%;">{(character.nome)}</p> <button class="editBtn" onclick={() => {
+                            dialogState = 2
+                            editCharImgUrl = character.img
+                            editCharName = character.nome
+                            editCharIdx = i
+                        }}>EDITAR</button> <button class="removeBtn" onclick={() => removeChar(i)}>-</button></div>
                     {/each}
                 </div>
                 <h3>ADICIONAR PERSONAGEM</h3>
-                <input bind:value={addCharName}> <button id="addBtn" onclick={addChar}>+</button>
+                <p style="color: black;">Nome:</p><input bind:value={addCharName}>
+                <p style="color: black;">Imagem (URL):</p><input bind:value={charImgUrl}><br>
+                <button style="margin-top: 4%;" id="addBtn" onclick={addChar}>+</button>
             </center>
         {:else if dialogState == 1}
             <center>
@@ -192,6 +218,13 @@
                 <input bind:value={roomPassword} type="password"><br>
                 <p style="color: red;">{roomError}</p><br>
                 <button id="createRoomBtn" onclick={createRoom}>CRIAR</button>
+            </center>
+        {:else if dialogState == 2}
+            <center>
+                <h3>EDITAR PERSONAGEM</h3>
+                <p style="color: black;">Nome:</p><input bind:value={editCharName}>
+                <p style="color: black;">Imagem (URL):</p><input bind:value={editCharImgUrl}><br>
+                <button style="margin-top: 4%;" id="saveBtn" onclick={editChar}>SALVAR</button>
             </center>
         {:else}
             <center>
@@ -223,7 +256,7 @@
 <div class="box">
     <center>
         <button onclick={() => dialogState = 1}>CRIAR UMA SALA</button><br>
-        <button onclick={() => dialogState = 2}>ENTRAR EM UMA SALA</button><br>
+        <button onclick={() => dialogState = 3}>ENTRAR EM UMA SALA</button><br>
         <button onclick={() => dialogState = 0}>ADICIONAR PERSONAGEM</button><br>
         <button id="logoutBtn" onclick={logout}>FINALIZAR SESSÃO</button>
     </center>
@@ -253,7 +286,7 @@ button {
     border-radius: 5px;
     border: none;
     color: black;
-    font-size: 16px;
+    font-size: 100%;
     margin-bottom: 2.5%;
 }
 button:hover {
@@ -339,21 +372,26 @@ h3 {
     width: 95%;
     height: 35vh;
     border-radius: 8px;
+    padding-top: 2%;
+    padding-bottom: 2%;
 }
 .charBox {
     background-color: white;
     width: 90%;
-    height: 4.5vh;
+    height: 8vh;
     border-radius: 6px;
     box-shadow: 0 0 15px #314d4a;
+    margin-bottom: 2%;
 }
 .charText {
     color: black;
     font-size: 16px;
     position: relative;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: -8%;
+    transform: translate(0px, -50%);
+    text-wrap: auto;
+    max-width: 45%;
 }
 #addBtn {
     background-color: #0b8770;
@@ -362,31 +400,100 @@ h3 {
     border-radius: 13px;
     margin-left: 2.5%;
 }
+#saveBtn {
+    background-color: #0b8770;
+    width: 2vw;
+    height: 3.5vh;
+    border-radius: 13px;
+    margin-left: 2.5%;
+    width: fit-content;
+}
 .removeBtn {
     position: relative;
-    left: 40%;
-    top: -70%;
+    left: 35%;
+    top: -125%;
     background-color: #eb8d8d;
     width: 2vw;
     height: 3.5vh;
     border-radius: 13px;
-    font-size: 24px;
+    font-size: 100%;
+}
+.editBtn {
+    width: fit-content;
+    height: 3.5vh;
+    position: relative;
+    top: -125%;
+    left: 30%;
+    border-radius: 13px;
+    background-color: #ebe68d;
 }
 .accessBtn {
     position: relative;
     left: 30%;
-    top: -80%;
+    top: -20%;
     background-color: #0b8770;
     width: 4vw;
     height: 3.5vh;
     border-radius: 13px;
-    font-size: 16px;
+    font-size: 90%;
 }
 #createRoomBtn {
     margin-top: 2.5%;
     background-color: #0b8770;
 }
+img {
+    object-fit: cover;
+    object-position: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 120px;
+}
+.imgDiv {
+    border-radius: 120px;
+    border: 4px solid black;
+    width: 14%;
+    height: 80%;
+    position: relative;
+    left: -40%;
+    top: 6%;
+}
 @media(max-height: 800px){
+    @keyframes show {
+        0% {
+            left: 15%;
+            top: 10%;
+            scale: 0
+        }
+        20% {
+            left: 15%;
+            top: 10%;
+            scale: 0.2
+        }
+        40% {
+            left: 15%;
+            top: 10%;
+            scale: 0.4
+        }
+        60% {
+            left: 15%;
+            top: 10%;
+            scale: 0.6
+        }
+        80% {
+            left: 20%;
+            top: 10%;
+            scale: 0.8
+        }
+        100% {
+            left: 25%;
+            top: 10%;
+            scale: 1
+        }
+    }
+    .dialogBox {
+        width: 45%;
+        left: 25%;
+    }
     .box {
         width: 45%;
         height: 50%;
@@ -404,20 +511,26 @@ h3 {
         height: 5vh;
     }
     .charBox {
-        height: 8vh;
+        height: 11.5vh;
         width: 96%;
     }
     .accessBtn {
         height: 5vh;
         width: 4.5vw;
-        font-size: 14px;
-        top: -55%;
+        top: -10%;
         text-align: center;
     }
     .removeBtn {
-        top: -50%;
         height: 5vh;
         width: 3vw;
+        left: 32%;
+    }
+    .editBtn {
+        left: 30%;
+    }
+    .imgDiv {
+        width: 14%;
+        margin-left: 5%;
     }
 }
 </style>
