@@ -212,7 +212,7 @@
             <div class="list">
                 {#each characters as character, i}
                     <div class="charBox">
-                        <p class="charText">{(character.nome)}</p> {#if playerCharacters.some(char => char.nome == character.nome)}<button class="removeBtn" style="top: -15%;" onclick={() => removeCharacterInRoom(i)}>-</button>{/if}
+                        <div class="imgDiv imgInfoBox"><img src={(character.img)} onerror={(e) => e.srcElement.src = defaultCharImg} alt=""></div><p class="charText" style="top: -60%;">{(character.nome)}</p> {#if playerCharacters.some(char => char.nome == character.nome)}<button class="removeBtn" style="top: -125%;" onclick={() => removeCharacterInRoom(i)}>-</button>{/if}
                     </div>
                 {/each}
             </div>
@@ -225,6 +225,7 @@
             <center>
                 {#each characters as character, i}
                     <div class="charBox initiativeBox">
+                        <div class="imgDiv imgDivInitiativeBox"><img src={(character.img)} onerror={(e) => e.srcElement.src = defaultCharImg} alt=""></div>
                         <p class="charText initiativeText">{(character.nome)}</p>
                         <p class="initiativeInputsText">VALOR:</p><input class="initiativeInputs" type="number" disabled={!playerCharacters.some(char => char.nome == character.nome)} value={(character.iniciativa)} onchange={(e) => {
                             setIniciativa(Number(e.srcElement.value), i)
@@ -447,7 +448,7 @@ dialog {
     padding-bottom: 2%;
 }
 .initiativeText {
-    top: 2%;
+    top: -20%;
     max-width: auto;
     text-wrap: none;
     text-align: center;
@@ -457,8 +458,12 @@ dialog {
 }
 .initiativeInputsText {
     color: black;
+    position: relative;
+    top: -20%;
 }
 .initiativeInputs {
+    position: relative;
+    top: -20%;
     width: 10%;
     text-align: center;
     padding:  0px;
@@ -481,6 +486,17 @@ img {
     position: relative;
     left: -40%;
     top: 6%;
+}
+.imgInfoBox {
+    width: 17%;
+}
+.imgDivInitiativeBox {
+    width: 10%;
+    height: 30%;
+    position: relative;
+    left: -25%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 @media(max-height: 800px){
     @keyframes show {
@@ -548,6 +564,21 @@ img {
     }
     .imgDiv {
         width: 10%;
+    }
+    .imgInfoBox {
+        width: 15%;
+    }
+    .infosBox {
+        width: 35%;
+    }
+    .functionsBox {
+        left: 40%;
+    }
+    .imgInfoBox {
+        width: 17%;
+    }
+    .imgDivInitiativeBox {
+        width: 12%;
     }
 }
 </style>
