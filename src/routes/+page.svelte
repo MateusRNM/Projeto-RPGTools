@@ -52,9 +52,6 @@ button:hover {
     scale: 1.03;
     background-color: #a6c288;
 }
-.box:hover {
-    scale: 1.05;
-}
 .centralBox {
     position: relative;
     left: 35%;

@@ -1,7 +1,7 @@
 <script>
 	import { goto } from "$app/navigation";
 	import { auth, roomsCollectionRef, setRoomRef, userCollectionRef } from "$lib/db";
-	import { onAuthStateChanged } from "@firebase/auth";
+	import { confirmPasswordReset, onAuthStateChanged, sendPasswordResetEmail } from "@firebase/auth";
 	import { deleteDoc, doc, getDoc, setDoc } from "@firebase/firestore";
     import defaultCharImg from '$lib/assets/userDefaultImg.png';
     let dialogState = $state(-1)
@@ -18,6 +18,9 @@
     let editCharName = $state("")
     let editCharImgUrl = $state("")
     let editCharIdx = $state()
+    let editUserName = $state("")
+    let dateOfSignup = $state("")
+    let resetPasswordEmailSent = $state("")
 
     onAuthStateChanged(auth, async (user) => {
         if(user){
@@ -25,6 +28,8 @@
             userDoc = await getDoc(userDocRef)
             userDoc = userDoc.data()
             username = userDoc.nome
+            editUserName = username
+            dateOfSignup = auth.currentUser.metadata.creationTime
             let arr = userDoc.personagens
             for(let i = 0; i < arr.length; i++){
                 characters.push(arr[i])
@@ -179,6 +184,10 @@
         setRoomRef(room)
         goto('/Projeto-RPGTools/room')
     }
+
+    function redefinirSenha(){
+        sendPasswordResetEmail(auth, auth.currentUser.email).then(() => resetPasswordEmailSent = "Email de redefinição de senha enviado.")
+    }
 </script>
 
 <dialog open={dialogState != -1} onclick={(ev) => {
@@ -188,6 +197,7 @@
         addCharName = ""
         roomName = ""
         roomPassword = ""
+        resetPasswordEmailSent = ""
     }
 }}>
     <div class="dialogBox">
@@ -226,7 +236,7 @@
                 <p style="color: black;">Imagem (URL):</p><input bind:value={editCharImgUrl}><br>
                 <button style="margin-top: 4%;" id="saveBtn" onclick={editChar}>SALVAR</button>
             </center>
-        {:else}
+        {:else if dialogState == 3}
             <center>
                 <h3>MINHAS SALAS</h3>
                 <div class="charList">
@@ -248,6 +258,22 @@
                 <p style="color: red;">{roomError}</p><br>
                 <button id="createRoomBtn" onclick={enterRoom}>ENTRAR</button>
             </center>
+        {:else}
+            <center><h3>MINHA CONTA</h3></center>
+            <div style="margin-top: 15%;">
+                <center>
+                    <p class="charText">Nome de usuário:</p>
+                    <input bind:value={editUserName}><br>
+                    <button style="background-color: #a6c288; margin-top: 5%;" onclick={redefinirSenha}>REDEFINIR SENHA</button>
+                    <p style="color: #0b8770; font-size: 20px;">{resetPasswordEmailSent}</p>
+                    <p style="color: black;">{`ID de usuário: ${userDoc ? userDoc.uid : ""}`}</p>
+                    <p style="color: black;">{`Data de criação da conta: ${dateOfSignup}`}</p>
+                    <button id="createRoomBtn" onclick={() => {
+                        username = editUserName
+                        saveData()
+                    }}>SALVAR</button>
+                </center>
+            </div>
         {/if}
     </div>
 </dialog>
@@ -258,6 +284,7 @@
         <button onclick={() => dialogState = 1}>CRIAR UMA SALA</button><br>
         <button onclick={() => dialogState = 3}>ENTRAR EM UMA SALA</button><br>
         <button onclick={() => dialogState = 0}>ADICIONAR PERSONAGEM</button><br>
+        <button onclick={() => dialogState = 4}>SUA CONTA</button><br>
         <button id="logoutBtn" onclick={logout}>FINALIZAR SESSÃO</button>
     </center>
 </div>

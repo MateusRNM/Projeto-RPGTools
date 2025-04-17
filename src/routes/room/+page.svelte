@@ -218,6 +218,8 @@
             </div>
         </center>
     </div>
+
+    <button id="exitBtn" onclick={() => goto('/Projeto-RPGTools/mainMenu')}>SAIR DA SALA</button>
     
     <div class="functionsBox">
         <center><h2>INICIATIVA</h2></center>
@@ -498,6 +500,15 @@ img {
     top: 50%;
     transform: translate(-50%, -50%);
 }
+#exitBtn {
+    position: absolute;
+    left: 2.5%;
+    top: 92%;
+    width: 15%;
+}
+#exitBtn:hover {
+    background-color: #eb8d8d;
+}
 @media(max-height: 800px){
     @keyframes show {
         0% {
@@ -579,6 +590,9 @@ img {
     }
     .imgDivInitiativeBox {
         width: 12%;
+    }
+    #exitBtn {
+        width: 30%;
     }
 }
 </style>

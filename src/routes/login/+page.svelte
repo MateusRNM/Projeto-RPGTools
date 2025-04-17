@@ -31,6 +31,7 @@
         <input placeholder="Digite seu email" bind:value={email}><br>
         <input placeholder="Digite sua senha" type="password" bind:value={senha}><br>
         <button onclick={logar}>LOGAR</button><br>
+        <button id="backBtn" onclick={() => goto('/Projeto-RPGTools/')}>VOLTAR</button>
     </div>
 </div>
 
@@ -68,9 +69,6 @@ button:hover {
     scale: 1.03;
     background-color: #a6c288;
 }
-.box:hover {
-    scale: 1.05;
-}
 .centralBox {
     position: relative;
     left: 35%;
@@ -95,6 +93,11 @@ p {
     font-size: 18px;
     position: relative;
     left: 35%;
+}
+#backBtn {
+    position: absolute;
+    left: 16%;
+    transform: translate(-50%, 0px);
 }
 @media(max-height: 800px){
     .box {
