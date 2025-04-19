@@ -1,9 +1,10 @@
 <script>
 	import { goto } from "$app/navigation";
 	import { auth, roomsCollectionRef, setRoomRef, userCollectionRef } from "$lib/db";
-	import { confirmPasswordReset, onAuthStateChanged, sendPasswordResetEmail } from "@firebase/auth";
+	import { confirmPasswordReset, deleteUser, onAuthStateChanged, reauthenticateWithCredential, sendPasswordResetEmail } from "@firebase/auth";
 	import { deleteDoc, doc, getDoc, setDoc } from "@firebase/firestore";
     import defaultCharImg from '$lib/assets/userDefaultImg.png';
+	import { EmailAuthProvider } from "@firebase/auth";
     let dialogState = $state(-1)
     let characters = $state([])
     let roomsCreated = $state([])
@@ -21,6 +22,9 @@
     let editUserName = $state("")
     let dateOfSignup = $state("")
     let resetPasswordEmailSent = $state("")
+    let reauthenticateEmail = $state("")
+    let reauthenticatePassword = $state("")
+    let reauthenticateError = $state("")
 
     onAuthStateChanged(auth, async (user) => {
         if(user){
@@ -177,6 +181,40 @@
         saveData()
     }
 
+    async function quitFromRoom(idx){
+        if(userDoc == null){
+            goto('/Projeto-RPGTools/')
+        }
+        let roomDoc = await getDoc(doc(roomsCollectionRef, roomsEntered[idx]))
+        let roomData = roomDoc.data()
+        let players = roomData.jogadores
+        let roomChars = []
+        for(let i = 0; i < players.length; i++){
+            if(players[i].uid != auth.currentUser.uid){
+                continue
+            }
+            let chars = players[i].personagens
+            roomChars = roomData.personagens
+            for(let j = 0; j < chars.length; j++){
+                for(let z = 0; z < roomChars.length; z++){
+                    if(chars[j].nome == roomChars[z].nome){
+                        roomChars.splice(z, 1)
+                    }
+                }
+            }
+            players.splice(i, 1)
+        }
+        await setDoc(doc(roomsCollectionRef, roomsEntered[idx]), {
+            jogadores: players,
+            nome: roomData.nome,
+            owner: roomData.owner,
+            personagens: roomChars,
+            senha: roomData.senha
+        })
+        roomsEntered.splice(idx, 1)
+        saveData()
+    }
+
     function accessRoom(room){
         if(userDoc == null){
             goto('/Projeto-RPGTools/')
@@ -188,6 +226,23 @@
     function redefinirSenha(){
         sendPasswordResetEmail(auth, auth.currentUser.email).then(() => resetPasswordEmailSent = "Email de redefinição de senha enviado.")
     }
+
+    async function deletarConta(){
+        for(let i = 0; i < roomsCreated.length; i++){
+            await deleteRoom(i)
+        }
+        for(let i = 0; i < roomsEntered.length; i++){
+            await quitFromRoom(i)
+        }
+        await deleteDoc(doc(userCollectionRef, auth.currentUser.uid))
+        await deleteUser(auth.currentUser)
+        goto('/Projeto-RPGTools/')
+    }
+
+    function reauthenticate(){
+        let credential = EmailAuthProvider.credential(reauthenticateEmail, reauthenticatePassword)
+        reauthenticateWithCredential(auth.currentUser, credential).then(() => deletarConta()).catch((error) => reauthenticateError = error)
+    }
 </script>
 
 <dialog open={dialogState != -1} onclick={(ev) => {
@@ -198,6 +253,9 @@
         roomName = ""
         roomPassword = ""
         resetPasswordEmailSent = ""
+        reauthenticateError = ""
+        reauthenticateEmail = ""
+        reauthenticatePassword = ""
     }
 }}>
     <div class="dialogBox">
@@ -258,21 +316,34 @@
                 <p style="color: red;">{roomError}</p><br>
                 <button id="createRoomBtn" onclick={enterRoom}>ENTRAR</button>
             </center>
-        {:else}
+        {:else if dialogState == 4}
             <center><h3>MINHA CONTA</h3></center>
             <div style="margin-top: 15%;">
                 <center>
                     <p class="charText">Nome de usuário:</p>
                     <input bind:value={editUserName}><br>
-                    <button style="background-color: #a6c288; margin-top: 5%;" onclick={redefinirSenha}>REDEFINIR SENHA</button>
-                    <p style="color: #0b8770; font-size: 20px;">{resetPasswordEmailSent}</p>
-                    <p style="color: black;">{`ID de usuário: ${userDoc ? userDoc.uid : ""}`}</p>
-                    <p style="color: black;">{`Data de criação da conta: ${dateOfSignup}`}</p>
                     <button id="createRoomBtn" onclick={() => {
                         username = editUserName
                         saveData()
-                    }}>SALVAR</button>
+                    }}>SALVAR NOME DE USUÁRIO</button><br>
+                    <p style="color: #0b8770; font-size: 20px;">{resetPasswordEmailSent}</p>
+                    <p style="color: black;">{`ID de usuário: ${userDoc ? userDoc.uid : ""}`}</p>
+                    <p style="color: black;">{`Data de criação da conta: ${dateOfSignup}`}</p>
+                    <button style="background-color: #a6c288; margin-top: 5%;" onclick={redefinirSenha}>REDEFINIR SENHA</button>
+                    <button style="background-color: red; margin-top: 10%;" onclick={() => dialogState = 5}>DELETAR CONTA</button>
                 </center>
+            </div>
+        {:else}
+            <center><h3 style="color: red; font-weight:300;">CONFIRME SEU LOGIN PARA DELETAR A CONTA</h3></center>
+            <div style="margin-top: 15%;">
+                <center>
+                    <p class="charText">EMAIL:</p>
+                    <input bind:value={reauthenticateEmail}>
+                    <p class="charText">SENHA:</p>
+                    <input bind:value={reauthenticatePassword} type="password"><br>
+                    <p style="color: red;">{reauthenticateError}</p>
+                    <button style="background-color: red; color: gold;" id="createRoomBtn" onclick={reauthenticate}>!!!   DELETAR   !!!</button>
+                </center> 
             </div>
         {/if}
     </div>
